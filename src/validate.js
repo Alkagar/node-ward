@@ -3,7 +3,7 @@ const _get = require('lodash.get');
 const _keys = require('lodash.keys');
 const _uniqWith = require('lodash.uniqwith');
 const _omit = require('lodash.omit');
-const _flatten = require('lodash.flatten');
+const _flattenDeep = require('lodash.flattendeep');
 const _isEqual = require('lodash.isequal');
 const _concat = require('lodash.concat');
 
@@ -59,7 +59,7 @@ const fieldsValidation = (x = {}, finalCallback) => {
       schema,
     }),
     (err, result) => {
-      const flattenedErrors = _uniqWith(_flatten(result), _isEqual);
+      const flattenedErrors = _uniqWith(_flattenDeep(result, 2), _isEqual);
       finalCallback(null, flattenedErrors);
     }
   );
@@ -85,7 +85,7 @@ const generalValidation = (x = {}, finalCallback) => {
       }
     },
     (err, result) => {
-      const flattenedErrors = _uniqWith(_flatten(result), _isEqual);
+      const flattenedErrors = _uniqWith(_flattenDeep(result, 2), _isEqual);
       finalCallback(null, flattenedErrors);
     }
   );

@@ -30,6 +30,7 @@ module.exports = {
           '_filter',
           '_uniqWith',
           '_flatten',
+          '_flattenDeep',
           '_isEqual',
           '_concat',
           '_isString',

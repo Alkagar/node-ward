@@ -1,4 +1,24 @@
-const _isString = require('lodash.isstring');
+const async = require('async');
+
+const isString = require('./is-string.js');
+
+const isEmail = (options, finalCallback) => {
+  const { data, config, fieldName } = options;
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const validEmail = re.test(data);
+
+  if (!validEmail) {
+    return finalCallback(null, {
+      check: false,
+      message: 'error.validate.is-not-email',
+      config: config.v,
+      fieldName,
+    });
+  }
+  return finalCallback(null, {
+    check: true,
+  });
+};
 
 /**
  * Checks if provided field is correct email address.
@@ -12,26 +32,13 @@ const _isString = require('lodash.isstring');
  * @returns {undefined} function does not return value, result is returned via callback provided
  */
 module.exports = (options, finalCallback) => {
-  const { data, config, fieldName } = options;
-  if (!_isString(data)) {
-    return finalCallback(null, {
-      check: false,
-      message: 'error.validate.not-string',
-      fieldName,
-    });
-  }
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const isEmail = re.test(data);
-
-  if (!isEmail) {
-    return finalCallback(null, {
-      check: false,
-      message: 'error.validate.is-not-email',
-      config: config.v,
-      fieldName,
-    });
-  }
-  return finalCallback(null, {
-    check: true,
-  });
+  async.parallel(
+    [callback => isString(options, callback), callback => isEmail(options, callback)],
+    (err, validationResults) => {
+      if (err) {
+        return finalCallback(err, null);
+      }
+      return finalCallback(null, validationResults);
+    }
+  );
 };
