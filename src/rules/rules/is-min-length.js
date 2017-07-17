@@ -1,25 +1,49 @@
-const _ = require('lodash');
+const async = require('async');
 
-module.exports = (options, callback) => {
-  const { schema, data, config, fieldName } = options;
+const isString = require('./is-string.js');
 
-  if (!_.isString(data)) {
-    return callback(null, {
-      check: false,
-      message: 'error.validate.not-string',
-      fieldName,
-    });
+const isMinLength = (options, callback) => {
+  const { data, config, fieldName } = options;
+  const notPassing = {
+    check: false,
+    message: 'error.validate.not-min',
+    config: config.v,
+    fieldName,
+  };
+
+  try {
+    const length = data.length;
+    if (length < config.v) {
+      return callback(null, notPassing);
+    }
+  } catch (ex) {
+    return callback(null, notPassing);
   }
-  const length = data.length;
-  if (length < config.v) {
-    return callback(null, {
-      check: false,
-      message: 'error.validate.not-min',
-      config: config.v,
-      fieldName,
-    });
-  }
+
   return callback(null, {
     check: true,
   });
+};
+
+/**
+ * Checks if provided string has min length
+ * @param {object} options
+ * @param {object} options.schema - full chema to validate
+ * @param {object} options.data - field value which validator should validate
+ * @param {object} options.fieldName - name of the field passed to validate
+ * @param {object} options.context - context of the field containing rest of the fields
+ * @param {object} options.config - object with validator configuration
+ * @param {function} finalCallback - callback which will return result of validation or error
+ * @returns {undefined} function does not return value, result is returned via callback provided
+ */
+module.exports = (options, finalCallback) => {
+  async.parallel(
+    [callback => isString(options, callback), callback => isMinLength(options, callback)],
+    (err, validationResults) => {
+      if (err) {
+        return finalCallback(err, null);
+      }
+      return finalCallback(null, validationResults);
+    }
+  );
 };

@@ -26,7 +26,7 @@ const isMaxLength = (options, callback) => {
 };
 
 /**
- * Checks if provided field is correct email address.
+ * Checks if provided string has max length
  * @param {object} options
  * @param {object} options.schema - full chema to validate
  * @param {object} options.data - field value which validator should validate
