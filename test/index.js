@@ -1,7 +1,5 @@
 const expect = require('expect.js');
 const getValidator = require('../src/index.js');
-// const ValidationError = require('../src/errors/validation.js');
-
 const genericTests = require('./generic-tests.js');
 
 const validator = getValidator({
