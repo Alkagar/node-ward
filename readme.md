@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/Alkagar/node-ward.svg?branch=master)](https://travis-ci.org/Alkagar/node-ward)
