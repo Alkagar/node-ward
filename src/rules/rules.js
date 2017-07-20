@@ -4,8 +4,10 @@ const isMaxLength = require('./rules/is-max-length.js');
 const isRequired = require('./rules/is-required.js');
 const allowUnknown = require('./rules/allow-unknown.js');
 const isEmail = require('./rules/is-email.js');
+const isString = require('./rules/is-string.js');
 
 module.exports = {
+  isString,
   isObject,
   isMinLength,
   isMaxLength,
