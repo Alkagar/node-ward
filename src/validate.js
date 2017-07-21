@@ -7,9 +7,7 @@ const _flattenDeep = require('lodash.flattendeep');
 const _isEqual = require('lodash.isequal');
 const _concat = require('lodash.concat');
 
-const rules = require('./rules/rules.js');
-
-const checkRule = ({ fieldValue, dataToValidate, schema, fieldName }) => (
+const checkRule = ({ rules, fieldValue, dataToValidate, schema, fieldName }) => (
   ruleDef,
   finalCallback
 ) => {
@@ -34,12 +32,13 @@ const checkRule = ({ fieldValue, dataToValidate, schema, fieldName }) => (
   }
 };
 
-const checkField = ({ dataToValidate, schema }) => (fieldName, callback) => {
+const checkField = ({ rules, dataToValidate, schema }) => (fieldName, callback) => {
   const fieldValue = _get(dataToValidate, fieldName);
   const fieldRules = _get(schema, fieldName, []);
   async.mapSeries(
     fieldRules,
     checkRule({
+      rules,
       fieldName,
       fieldValue,
       dataToValidate,
@@ -50,11 +49,12 @@ const checkField = ({ dataToValidate, schema }) => (fieldName, callback) => {
 };
 
 const fieldsValidation = (x = {}, finalCallback) => {
-  const { fieldSchema, dataToValidate, schema } = x;
+  const { rules, fieldSchema, dataToValidate, schema } = x;
   const keys = _keys(fieldSchema);
   async.mapSeries(
     keys,
     checkField({
+      rules,
       dataToValidate,
       schema,
     }),
@@ -66,7 +66,7 @@ const fieldsValidation = (x = {}, finalCallback) => {
 };
 
 const generalValidation = (x = {}, finalCallback) => {
-  const { general, dataToValidate, schema } = x;
+  const { rules, general, dataToValidate, schema } = x;
   async.mapSeries(
     general,
     (ruleDef, callback) => {
@@ -91,17 +91,25 @@ const generalValidation = (x = {}, finalCallback) => {
   );
 };
 
-const validate = (schema, dataToValidate, finalCallback) => {
+const validate = (schema, rules, dataToValidate, finalCallback) => {
   const general = schema._;
   const fieldSchema = _omit(schema, ['_']);
 
   async.auto(
     {
+      rules: callback => callback(null, rules),
       general: callback => callback(null, general),
       dataToValidate: callback => callback(null, dataToValidate),
       schema: callback => callback(null, schema),
       fieldSchema: callback => callback(null, fieldSchema),
-      generalValidation: ['general', 'dataToValidate', 'schema', 'fieldSchema', generalValidation],
+      generalValidation: [
+        'rules',
+        'general',
+        'dataToValidate',
+        'schema',
+        'fieldSchema',
+        generalValidation,
+      ],
       fieldsValidation: ['general', 'dataToValidate', 'schema', 'fieldSchema', fieldsValidation],
     },
     (err, result) => {
