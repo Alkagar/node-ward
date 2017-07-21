@@ -1,6 +1,7 @@
 const _keys = require('lodash.keys');
 const _omit = require('lodash.omit');
 const _difference = require('lodash.difference');
+const _get = require('lodash.get');
 
 /**
  * Check if in object are unknown properties
@@ -10,13 +11,15 @@ const _difference = require('lodash.difference');
  * @param {object} options.config - object with validator configuration
  */
 module.exports = (options, callback) => {
-  const { schema, data } = options;
+  const { schema, data, config } = options;
 
   const dataKeys = _keys(_omit(data, ['_']));
   const schemaKeys = _keys(_omit(schema, ['_']));
   const unknown = _difference(dataKeys, schemaKeys);
+  const unknownPresent = unknown.length > 0;
+  const allowUnknown = _get(config, 'v', false);
 
-  if (unknown.length > 0) {
+  if (unknownPresent && !allowUnknown) {
     return callback(null, {
       check: false,
       message: 'error.validate.unknown-properties',

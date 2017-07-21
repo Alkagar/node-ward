@@ -88,3 +88,5 @@ describe('Validators::Custom Tests::', () => {
     });
   });
 });
+
+require('./schemas.js');

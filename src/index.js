@@ -2,30 +2,34 @@ const _filter = require('lodash.filter');
 
 const ValidationError = require('./errors/validation.js');
 const validate = require('./validate.js');
+const ERROR_MESSAGES = require('./error-messages.js');
 
 const rules = require('./rules/rules.js');
 
-const getValidator = (schemas, customRules = {}) => (schemaName, dataToValidate, callback) => {
-  const schema = schemas[schemaName];
-  if (!schema) {
-    return callback(new ValidationError('error.validation.no-schema-defined'), null);
-  }
-
+const getValidator = (schemas, customRules = {}) => {
   const allRules = Object.assign({}, rules, customRules);
+  const noSchemaError = new ValidationError(ERROR_MESSAGES.NO_SCHEMA);
 
-  return validate(schema, allRules, dataToValidate, (err, validationResult) => {
-    const realErrors = _filter(validationResult, error => !error.check);
-
-    if (realErrors.length > 0) {
-      return callback(
-        new ValidationError('error.validation', {
-          validationResult: realErrors,
-        }),
-        null
-      );
+  return (schemaName, dataToValidate, callback) => {
+    const schema = schemas[schemaName];
+    if (!schema) {
+      return callback(noSchemaError, null);
     }
-    return callback(null, null);
-  });
+
+    return validate(schema, allRules, dataToValidate, (err, validationResult) => {
+      const realErrors = _filter(validationResult, error => !error.check);
+
+      if (realErrors.length > 0) {
+        return callback(
+          new ValidationError(ERROR_MESSAGES.VALIDATION, {
+            validationResult: realErrors,
+          }),
+          null
+        );
+      }
+      return callback(null, null);
+    });
+  };
 };
 
 /**
