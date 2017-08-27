@@ -1,19 +1,22 @@
 const _isString = require('lodash.isstring');
 
-const isString = (options, finalCallback) => {
+const isString = (options) => {
   const { data, fieldName } = options;
 
   if (!_isString(data)) {
-    return finalCallback(null, {
+    return {
       check: false,
       message: 'error.validate.not-string',
       fieldName,
-    });
+    };
   }
-  return finalCallback(null, {
+  return {
     check: true,
-  });
+  };
 };
+
+const sync = options => [isString(options)];
+const async = (options, callback) => callback(null, sync(options));
 
 /**
  * Checks if provided field is correct email address.
@@ -26,4 +29,5 @@ const isString = (options, finalCallback) => {
  * @param {function} finalCallback - callback which will return result of validation or error
  * @returns {undefined} function does not return value, result is returned via callback provided
  */
-module.exports = isString;
+module.exports.async = async;
+module.exports.sync = sync;

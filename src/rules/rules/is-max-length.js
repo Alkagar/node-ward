@@ -1,8 +1,6 @@
-const async = require('async');
-
 const isString = require('./is-string.js');
 
-const isMaxLength = (options, callback) => {
+const isMaxLength = (options) => {
   const { data, config, fieldName } = options;
   const notPassing = {
     check: false,
@@ -14,16 +12,19 @@ const isMaxLength = (options, callback) => {
   try {
     const length = data.length;
     if (length > config.v) {
-      return callback(null, notPassing);
+      return notPassing;
     }
   } catch (ex) {
-    return callback(null, notPassing);
+    return notPassing;
   }
 
-  return callback(null, {
+  return {
     check: true,
-  });
+  };
 };
+
+const sync = options => [isString.sync(options), isMaxLength(options)];
+const async = (options, callback) => callback(null, sync(options));
 
 /**
  * Checks if provided string has max length
@@ -36,14 +37,5 @@ const isMaxLength = (options, callback) => {
  * @param {function} finalCallback - callback which will return result of validation or error
  * @returns {undefined} function does not return value, result is returned via callback provided
  */
-module.exports = (options, finalCallback) => {
-  async.parallel(
-    [callback => isString(options, callback), callback => isMaxLength(options, callback)],
-    (err, validationResults) => {
-      if (err) {
-        return finalCallback(err, null);
-      }
-      return finalCallback(null, validationResults);
-    }
-  );
-};
+module.exports.async = async;
+module.exports.sync = sync;

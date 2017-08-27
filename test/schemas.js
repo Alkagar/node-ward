@@ -1,9 +1,9 @@
 const expect = require('expect.js');
-const getValidator = require('../src/index.js');
+const ward = require('../src/index.js');
 const ValidationError = require('../src/errors/validation.js');
 const ERROR_MESSAGES = require('../src/error-messages.js');
 
-const validator = getValidator({
+const validator = ward.getSchemaValidator({
   example: {
     email: [{ n: 'isEmail' }, { n: 'isRequired' }],
   },

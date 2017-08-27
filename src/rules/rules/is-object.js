@@ -1,6 +1,6 @@
 const _isObject = require('lodash.isobject');
 
-const isObject = (options, callback) => {
+const isObject = (options) => {
   const { data, fieldName } = options;
   const notPassing = {
     check: false,
@@ -13,12 +13,15 @@ const isObject = (options, callback) => {
       throw new Error();
     }
   } catch (ex) {
-    return callback(null, notPassing);
+    return notPassing;
   }
-  return callback(null, {
+  return {
     check: true,
-  });
+  };
 };
+
+const sync = options => [isObject(options)];
+const async = (options, callback) => callback(null, sync(options));
 
 /**
  * Checks if provided field is object
@@ -31,4 +34,5 @@ const isObject = (options, callback) => {
  * @param {function} finalCallback - callback which will return result of validation or error
  * @returns {undefined} function does not return value, result is returned via callback provided
  */
-module.exports = isObject;
+module.exports.async = async;
+module.exports.sync = sync;

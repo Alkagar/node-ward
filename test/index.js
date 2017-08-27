@@ -1,8 +1,9 @@
 const expect = require('expect.js');
-const getValidator = require('../src/index.js');
+const ward = require('../src/index.js');
 const genericTests = require('./generic-tests.js');
+const genericAsync = require('./async.js');
 
-const validator = getValidator({
+const validator = ward.getSchemaValidator({
   example: {
     email: [{ n: 'isEmail' }, { n: 'isRequired' }],
   },
@@ -73,6 +74,22 @@ describe('Validators::Generic Tests::', () => {
     fieldName: 'name',
     errorMessage: 'error.validate.is-required',
   });
+
+  genericAsync({
+    validatorName: 'isEmail',
+    schema: [{ n: 'isEmail' }],
+    correctData: 'john@example.com',
+    wrongData: 'not-email',
+    errorMessage: 'error.validate.is-not-email',
+  });
+
+  genericAsync({
+    validatorName: 'isMaxLength',
+    schema: [{ n: 'isMaxLength', v: 6 }],
+    correctData: 'John',
+    wrongData: 'JohnJohn',
+    errorMessage: 'error.validate.not-max',
+  });
 });
 
 describe('Validators::Custom Tests::', () => {
@@ -87,6 +104,35 @@ describe('Validators::Custom Tests::', () => {
       });
     });
   });
+
+  describe('resistance to bullshit', () => {
+    it('should detect when rule is not defined', () => {
+      const validationResult = ward.validateDataSync(
+        [{ n: 'not-existing-rule' }],
+        'data-does-not-matter'
+      );
+      const validationDetails = validationResult.details.validationResult;
+      validationDetails.forEach(detail => expect(detail).to.have.property('check', false));
+      validationDetails.forEach(detail =>
+        expect(detail).to.have.property('message', 'error.validate.not-existing-rule')
+      );
+    });
+    it('should detect and throw exception when rules are not an array', () => {
+      expect(() => {
+        ward.validateDataSync({ n: [] }, 'data-does-not-matter');
+      }).to.throwException('error.validate.rule-definition-must-be-an-array');
+    });
+    it('should detect when rule is not a string', () => {
+      const validationResult = ward.validateDataSync([{ n: [] }], 'data-does-not-matter');
+      const validationDetails = validationResult.details.validationResult;
+      validationDetails.forEach(detail => expect(detail).to.have.property('check', false));
+      validationDetails.forEach(detail =>
+        expect(detail).to.have.property('message', 'error.validate.rule-name-is-not-a-string')
+      );
+    });
+  });
 });
 
 require('./schemas.js');
+
+require('./sync.js');

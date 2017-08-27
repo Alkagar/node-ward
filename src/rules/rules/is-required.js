@@ -1,6 +1,6 @@
 const _isUndefined = require('lodash.isundefined');
 
-const isRequired = (options, callback) => {
+const isRequired = (options) => {
   const { data, fieldName } = options;
 
   try {
@@ -8,17 +8,20 @@ const isRequired = (options, callback) => {
       throw new Error();
     }
   } catch (ex) {
-    return callback(null, {
+    return {
       check: false,
       message: 'error.validate.is-required',
       fieldName,
-    });
+    };
   }
 
-  return callback(null, {
+  return {
     check: true,
-  });
+  };
 };
+
+const sync = options => [isRequired(options)];
+const async = (options, callback) => callback(null, sync(options));
 
 /**
  * Checks if provided field is set in object
@@ -31,4 +34,5 @@ const isRequired = (options, callback) => {
  * @param {function} finalCallback - callback which will return result of validation or error
  * @returns {undefined} function does not return value, result is returned via callback provided
  */
-module.exports = isRequired;
+module.exports.async = async;
+module.exports.sync = sync;

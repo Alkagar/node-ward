@@ -3,14 +3,7 @@ const _omit = require('lodash.omit');
 const _difference = require('lodash.difference');
 const _get = require('lodash.get');
 
-/**
- * Check if in object are unknown properties
- * @param {object} options
- * @param {object} options.schema - full chema to validate
- * @param {object} options.data - object which validator should validate
- * @param {object} options.config - object with validator configuration
- */
-module.exports = (options, callback) => {
+const sync = (options) => {
   const { schema, data, config } = options;
 
   const dataKeys = _keys(_omit(data, ['_']));
@@ -20,13 +13,25 @@ module.exports = (options, callback) => {
   const allowUnknown = _get(config, 'v', false);
 
   if (unknownPresent && !allowUnknown) {
-    return callback(null, {
+    return {
       check: false,
       message: 'error.validate.unknown-properties',
       details: unknown,
-    });
+    };
   }
-  return callback(null, {
+  return {
     check: true,
-  });
+  };
 };
+
+const async = (options, callback) => callback(null, sync(options));
+
+/**
+ * Check if in object are unknown properties
+ * @param {object} options
+ * @param {object} options.schema - full chema to validate
+ * @param {object} options.data - object which validator should validate
+ * @param {object} options.config - object with validator configuration
+ */
+module.exports.async = async;
+module.exports.sync = sync;
