@@ -13,7 +13,7 @@ const checkRule = ({ rules, fieldValue, dataToValidate, schema, fieldName }) => 
 ) => {
   const rule = rules[ruleDef.n];
   if (rule) {
-    rule(
+    rule.async(
       {
         data: fieldValue,
         schema,

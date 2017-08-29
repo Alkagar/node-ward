@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 
-const getValidator = require('../src/index.js');
+const ward = require('../src/index.js');
 const ValidationError = require('../src/errors/validation.js');
 
 module.exports = (x = {}) => {
@@ -10,7 +10,7 @@ module.exports = (x = {}) => {
   const errorMessage = x.errorMessage || 'error.no-error-message';
   const validatorName = x.validatorName || 'error.unknown-validator';
 
-  const validator = getValidator({
+  const validator = ward.getSchemaValidator({
     example: {
       [fieldName]: x.schema || [],
     },

@@ -11,7 +11,10 @@
     "type": "git",
     "url": "git+ssh://git@github.com/Alkagar/node-ward.git"
   },
-  "keywords": ["nodejs", "validators"],
+  "keywords": [
+    "nodejs",
+    "validators"
+  ],
   "author": "Alkagar",
   "license": "ISC",
   "bugs": {
