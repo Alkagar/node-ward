@@ -5,6 +5,9 @@ const isRequired = require('./rules/is-required.js');
 const allowUnknown = require('./rules/allow-unknown.js');
 const isEmail = require('./rules/is-email.js');
 const isString = require('./rules/is-string.js');
+const hasOneLower = require('./rules/has-one-lower.js');
+const hasOneUpper = require('./rules/has-one-upper.js');
+const hasOneDigit = require('./rules/has-one-digit.js');
 
 module.exports = {
   isString,
@@ -14,4 +17,7 @@ module.exports = {
   isRequired,
   allowUnknown,
   isEmail,
+  hasOneLower,
+  hasOneUpper,
+  hasOneDigit,
 };
